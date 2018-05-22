@@ -633,9 +633,18 @@ function getCPDependentKeysFor(attribute, model, validations) {
 
   dependentKeys.push(`model.${attribute}`);
 
-  if (isDsModel(model)) {
-    dependentKeys.push('model.isDeleted');
-  }
+ // Do not add isDeleted to the dependent keys because it also gets notified
+ // when isDirty is updated which make the whole model re-validate each time
+ // isDirty is notified.
+ // 
+ // This was added to not validate soft deleted models (deleted but not saved
+ // in backend) but I do not have such use case for now so I don't really care
+ // 
+ // Issue: https://github.com/emberjs/data/issues/966
+ //
+ // if (isDsModel(model)) {
+ //   dependentKeys.push('model.isDeleted');
+ // }
 
   dependentKeys = dependentKeys.map(d => {
     return d.replace(/^model\./, `${ATTRS_MODEL}.`);
